@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>서울쉼💚</title>
+        <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+        <link href="css/styles.css" rel="stylesheet" />
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+        <style>
+            body {
+                margin: 0;
+            }
+
+            #map{
+                height: 100vh;
+            }
+            #mapwrap{position:relative;overflow:hidden;}
+            .category, .category *{margin:0;padding:0;color:#000;}   
+            .category {position:absolute;overflow:hidden;top:10px;left:10px;width:300px;height:50px;z-index:1000;border:1px solid black;font-family:'Malgun Gothic','맑은 고딕',sans-serif;font-size:12px;text-align:center;background-color:#fff; display: flex; justify-content: space-around; align-items: center;flex-direction: row;}
+            .category .menu_selected {background:#FFDF24;color:#fff;border-left:1px solid #915B2F;border-right:1px solid #915B2F;margin:0; padding: 0;} 
+            .category ul {
+                padding-left: 0;
+                margin: 0;
+                display: flex;
+                list-style-type: none;
+            }
+            .category li{list-style:none;width:50px;height:45px;cursor:pointer;display: flex; flex-direction: column;justify-content: center;align-items: center;} 
+            .category .ico_comm {display:block;width:32px;height:32px;background:url('image/아이콘모음.png') no-repeat; background-size: 32px 192px;margin-bottom: 5px;} 
+            .category .ico_shade {background-position:0px 0px;}  
+            .category .ico_climat {background-position:0px -32px;}   
+            .category .ico_heat {background-position:0px -64px;} 
+            .category .ico_smart {background-position:0px -96px;} 
+            .category .ico_cool {background-position:0px -128px;} 
+            .category .ico_cold {background-position:0px -160px;}
+            .popup {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: white;
+                border: 1px solid black;
+                padding: 20px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                z-index: 1000;
+            }
+        </style>
+    </head>
+    <body class="sb-nav-fixed">
+        <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+            <!-- Navbar Brand-->
+            <a class="navbar-brand ps-3" href="index.html">서울쉼</a>
+            <!-- Sidebar Toggle-->
+            <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+            <!-- Navbar Search-->
+            <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+                <div class="input-group">
+                    <input class="form-control" type="text" placeholder="주소를 입력하세요" aria-label="Search for address..." aria-describedby="btnNavbarSearch" id="searchInput" />
+                    <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
+                </div>
+            </form>            
+        </nav>
+        <div id="layoutSidenav">
+            <div id="layoutSidenav_nav">
+                <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                    <div class="sb-sidenav-menu">
+                        <div class="nav">
+                            <div class="sb-sidenav-menu-heading">Main</div>
+                            <a class="nav-link" href="index.html">
+                                <div class="sb-nav-link-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                                서울쉼 지도
+                            </a>
+                            <a class="nav-link" href="total_map.html">
+                                <div class="sb-nav-link-icon"><i class="fa-solid fa-map"></i></div>
+                                서울쉼 전체 지도
+                            </a>
+                            <div class="sb-sidenav-menu-heading">Information</div>
+                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseShelterInfo" aria-expanded="false" aria-controls="collapseLayouts">
+                                <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-info"></i></div>
+                                쉼터 설명
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            </a>
+                            <div class="collapse" id="collapseShelterInfo" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                                <nav class="sb-sidenav-menu-nested nav">
+                                    <a class="nav-link" href="shadetables.html">그늘막</a>
+                                    <a class="nav-link" href="climattables.html">기후동행쉼터</a>
+                                    <a class="nav-link" href="heattables.html">무더위쉼터</a>
+                                    <a class="nav-link" href="smarttables.html">스마트쉼터</a>
+                                    <a class="nav-link" href="cooltables.html">쿨하다 캠페인</a>
+                                    <a class="nav-link" href="coldtables.html">한파쉼터</a>
+                                </nav>
+                            </div>
+                            <div class="sb-sidenav-menu-heading">Recommend</div>
+                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseRecommend" aria-expanded="false" aria-controls="collapsePages">
+                                <div class="sb-nav-link-icon"><i class="fa-solid fa-globe"></i></div>
+                                서비스 별 추천 쉼터
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            </a>
+                            <div class="collapse" id="collapseRecommend" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                                <nav class="sb-sidenav-menu-nested nav">
+                                    <a class="nav-link" href="wifi_index.html">Wi-Fi</a>
+                                    <a class="nav-link" href="charge_index.html">충전시설</a>
+                                </nav>
+                            </div>
+                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseWeatherRecommend" aria-expanded="false" aria-controls="collapsePages">
+                                <div class="sb-nav-link-icon"><i class="fa-solid fa-sun"></i></div>
+                                날씨 별 추천 쉼터
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            </a>
+                            <div class="collapse" id="collapseWeatherRecommend" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                                <nav class="sb-sidenav-menu-nested nav">
+                                    <a class="nav-link" href="sumer.html">폭염/비</a>
+                                    <a class="nav-link" href="winter.html">한파/눈</a>
+                                    <a class="nav-link" href="sumer_n_winter.html">폭염/비/한파/눈</a>
+                                    <a class="nav-link" href="dust.html">미세먼지</a>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sb-sidenav-footer">
+                        <div class="small">도시 속 작은 쉼터</div>
+                        서울쉼
+                    </div>
+                </nav>
+            </div>
+            <div id="layoutSidenav_content">
+                <main>
+                    <div id="mapwrap">
+                        <div id="map" style="width:100%;height:100vh;"></div>
+                        <div class="category">
+                        <ul>
+                            <li id="shadeMenu" onclick="changeMarker('shade')">
+                            <span class="ico_comm ico_shade"></span>
+                            그늘막
+                            </li>
+                            <li id="climatMenu" onclick="changeMarker('climat')">
+                            <span class="ico_comm ico_climat"></span>
+                            기후동행
+                            </li>
+                            <li id="heatMenu" onclick="changeMarker('heat')">
+                            <span class="ico_comm ico_heat"></span>
+                            무더위
+                            </li>
+                            <li id="smartMenu" onclick="changeMarker('smart')">
+                            <span class="ico_comm ico_smart"></span>
+                            스마트
+                            </li>
+                            <li id="coolMenu" onclick="changeMarker('cool')">
+                            <span class="ico_comm ico_cool"></span>
+                            쿨하다
+                            </li>
+                            <li id="coldMenu" onclick="changeMarker('cold')">
+                            <span class="ico_comm ico_cold"></span>
+                            한파
+                            </li>
+                        </ul>
+                        </div>
+                    </div>
+                    <script type="text/javascript"
+                        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5d5e9e2659eb26ee7fdf92c7176b16d6&libraries=services"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+                    <script>
+                        var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+                        mapOption = {
+                            center: new kakao.maps.LatLng(37.498004414546934, 127.02770621963765), // 지도의 중심좌표
+                            level: 3 // 지도의 확대 레벨
+                        };
+
+                        var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+                        let shadeMarkers = [];
+                        let climatMarkers = [];
+                        let heatMarkers = [];
+                        let smartMarkers = [];
+                        let coolMarkers = [];
+                        let coldMarkers = [];
+
+                        // 현재 열려있는 인포윈도우를 저장하는 변수
+                        let currentInfoWindow = null;
+
+                        const shelterData = [
+                            { name : '그늘막', 운영시작일: '2025-04-21', 운영종료일: '2025-09-01'},
+                            { name : '기후동행쉼터', 운영시작일: '2025-05-01', 운영종료일: '2025-09-30'},
+                            { name : '무더위쉼터', 운영시작일: '2025-05-15', 운영종료일: '2025-09-30'},
+                            { name : '스마트쉼터', 운영시작일: '2025-01-01', 운영종료일: '2025-12-31'},
+                            { name : '쿨하다 캠페인 도서관', 운영시작일: '2024-07-01', 운영종료일: '2024-08-31'},
+                            { name : '한파쉼터', 운영시작일: '2024-11-15', 운영종료일: '2025-03-15'}
+                        ];
+                        // 현재 날짜 가져오기
+                        const today = new Date();
+                        const year = today.getFullYear();
+                        const month = String(today.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1, 두 자리 수로 만들기
+                        const day = String(today.getDate()).padStart(2, '0'); // 일을 두 자리 수로 만들기
+                        const currentDate = `${year}-${month}-${day}`;
+
+                        // 현재 날짜에 해당하는 쉼터 찾기
+                        const operatingShelters = shelterData.filter(shelter => {
+                            return shelter.운영시작일 <= currentDate && shelter.운영종료일 >= currentDate;
+                        });
+
+                        // 팝업 메시지 생성
+                        let popupMessage = '현재 운영 중인 쉼터: ';
+                        if (operatingShelters.length > 0) {
+                            const shelterNames = operatingShelters.map(shelter => shelter.name).join(', ');
+                            popupMessage += shelterNames;
+                        } else {
+                            popupMessage += '운영 중인 쉼터가 없습니다.';
+                        }
+
+                        // 팝업 생성 및 표시
+                        const popupDiv = document.createElement('div');
+                        popupDiv.className = 'popup';
+                        popupDiv.textContent = popupMessage;
+                        document.body.appendChild(popupDiv);
+
+                        // 팝업을 자동으로 닫는 기능 추가
+                        setTimeout(() => {
+                            popupDiv.remove();
+                        }, 3000); // 5초 후에 팝업 닫기
+
+                        // JSON 파일을 로드하는 함수
+                        function loadJsonFiles(files) {
+                        const promises = Object.entries(files).map(([category, file]) =>
+                            fetch(file)
+                            .then((response) => {
+                                if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                                return response.json();
+                            })
+                            .then((data) => {
+                                console.log(`Loaded ${file}:`, data); // 데이터 로딩 확인
+                                return data.map(item => ({ ...item, category: category }));
+                            })
+                            .catch((error) => {
+                                console.error(`Error loading ${file}:`, error);
+                                return [];
+                            })
+                        );
+                        return Promise.all(promises).then(results => results.flat());
+                        }
+
+                        // 마커 이미지를 생성하는 함수입니다
+                        function createMarkerImage(src, size, options) {
+                        var markerImage = new kakao.maps.MarkerImage(src, size, options);
+                        return markerImage;
+                        }
+
+                        // 좌표와 마커이미지를 받아 마커를 생성하여 리턴하는 함수입니다
+                        function createMarker(position, image, data) {
+                        var marker = new kakao.maps.Marker({
+                            position: position,
+                            image: image
+                        });
+                        marker.category = data.category; // 마커에 카테고리 정보 저장
+                        // 마커 클릭 시 인포윈도우를 표시하는 이벤트 리스너
+                        kakao.maps.event.addListener(marker, 'click', function() {
+                            // 클릭 시 다른 인포윈도우가 열려있으면 닫기
+                            if (currentInfoWindow) {
+                                currentInfoWindow.close();
+                            }
+                            //인포인도우에 표시할 링크 생성
+                            let menuUrl = '';
+                            switch (data.category) {
+                                case 'shade': menuUrl = '/shadetables.html?search=' + encodeURIComponent(data['쉼터명']);break;
+                                case 'climat': menuUrl = '/climattables.html?search=' + encodeURIComponent(data['쉼터명']);break;
+                                case 'heat': menuUrl = '/heattables.html?search=' + encodeURIComponent(data['쉼터명']);break;
+                                case 'smart': menuUrl = '/smarttables.html?search=' + encodeURIComponent(data['쉼터명']);break;
+                                case 'cool': menuUrl = '/cooltables.html?search=' + encodeURIComponent(data['쉼터명']);break;
+                                case 'cold': menuUrl = '/coldtables.html?search=' + encodeURIComponent(data['쉼터명']);break;
+                            }
+
+                            // 인포윈도우에 표시할 내용 생성
+                            var iwContent = '<div style="padding:5px;"><a href="' + menuUrl + '">' + data['쉼터명'] + '</a><br>' + '<a href="https://map.kakao.com/link/search/' + encodeURIComponent(data['주소']) + '" style="color:blue" target="_blank">' + data['주소'] + '</a></div>';
+                            
+                            var iwPosition = position; // 인포윈도우 표시 위치를 마커 위치로 설정
+ 
+                            // 인포윈도우 생성
+                            var infowindow = new kakao.maps.InfoWindow({
+                                position : iwPosition,
+                                content : iwContent
+                            });
+
+                            // 인포윈도우를 지도에 표시
+                            infowindow.open(map, marker);
+                            currentInfoWindow = infowindow; // 현재 열린 인포윈도우를 저장
+                        });
+                        return marker;
+                        }
+
+                        function initMap() {
+                        const jsonFiles = {
+                            shade: 'data/shade.json',
+                            climat: 'data/climat.json',
+                            heat: 'data/heat.json',
+                            smart: 'data/smart.json',
+                            cool: 'data/cool.json',
+                            cold: 'data/cold.json'
+                        };
+
+                        // 카테고리별 이미지 파일 경로를 정의합니다.
+                        const markerImageUrls = {
+                            shade: 'image/그늘막.png',
+                            climat: 'image/기후동행쉼터.png',
+                            heat: 'image/무더위쉼터.png',
+                            smart: 'image/스마트쉼터.png',
+                            cool: 'image/쿨하다캠페인.png',
+                            cold: 'image/한파쉼터.png',
+                        };
+
+                        loadJsonFiles(jsonFiles)
+                            .then((data) => {
+                            data.forEach(item => {
+                                let markerPosition = new kakao.maps.LatLng(item['decimalLatitude'], item['decimalLongitude']);
+                                let markerImage = null;
+
+                                var imageSize = new kakao.maps.Size(32, 32);
+                                var imageOptions = {
+                                anchor: new kakao.maps.Point(16, 16)
+                                };
+
+                                // 카테고리에 따라 마커 이미지 설정
+                                const imageUrl = markerImageUrls[item.category];
+                                if (imageUrl) {
+                                markerImage = createMarkerImage(imageUrl, imageSize, imageOptions);
+                                }
+
+                                let marker = createMarker(markerPosition, markerImage, item);
+
+                                // 카테고리별 마커 배열에 추가
+                                switch (item.category) {
+                                case 'shade': shadeMarkers.push(marker); break;
+                                case 'climat': climatMarkers.push(marker); break;
+                                case 'heat': heatMarkers.push(marker); break;
+                                case 'smart': smartMarkers.push(marker); break;
+                                case 'cool': coolMarkers.push(marker); break;
+                                case 'cold': coldMarkers.push(marker); break;
+                                }
+                            });
+
+                            console.log('shadeMarkers:', shadeMarkers);
+                            console.log('climatMarkers:', climatMarkers);
+                            console.log('heatMarkers:', heatMarkers);
+                            console.log('smartMarkers:', smartMarkers);
+                            console.log('coolMarkers:', coolMarkers);
+                            console.log('coldMarkers:', coldMarkers);
+
+                            changeMarker('shade');
+                            })
+                            .catch(error => console.error('Error initializing map:', error));
+                        }
+
+                        document.addEventListener('DOMContentLoaded', initMap);
+
+                        // 카테고리를 클릭했을 때 type에 따라 카테고리의 스타일과 지도에 표시되는 마커를 변경합니다
+                        function changeMarker(type) {
+
+                        var shadeMenu = document.getElementById('shadeMenu');
+                        var climatMenu = document.getElementById('climatMenu');
+                        var heatMenu = document.getElementById('heatMenu');
+                        var smartMenu = document.getElementById('smartMenu');
+                        var coolMenu = document.getElementById('coolMenu');
+                        var coldMenu = document.getElementById('coldMenu');
+
+                        // 카테고리 스타일 변경
+                        shadeMenu.className = type === 'shade' ? 'menu_selected' : '';
+                        climatMenu.className = type === 'climat' ? 'menu_selected' : '';
+                        heatMenu.className = type === 'heat' ? 'menu_selected' : '';
+                        smartMenu.className = type === 'smart' ? 'menu_selected' : '';
+                        coolMenu.className = type === 'cool' ? 'menu_selected' : '';
+                        coldMenu.className = type === 'cold' ? 'menu_selected' : '';
+
+                        // 모든 마커 숨김
+                        hideAllMarkers();
+
+                        // 선택된 카테고리의 마커만 표시
+                        let selectedMarkers = [];
+                        switch (type) {
+                            case 'shade':
+                            selectedMarkers = shadeMarkers;
+                            break;
+                            case 'climat':
+                            selectedMarkers = climatMarkers;
+                            break;
+                            case 'heat':
+                            selectedMarkers = heatMarkers;
+                            break;
+                            case 'smart':
+                            selectedMarkers = smartMarkers;
+                            break;
+                            case 'cool':
+                            selectedMarkers = coolMarkers;
+                            break;
+                            case 'cold':
+                            selectedMarkers = coldMarkers;
+                            break;
+                        }
+                        showMarkers(selectedMarkers);
+                        }
+
+                        // 모든 마커를 숨기는 함수
+                        function hideAllMarkers() {
+                        shadeMarkers.forEach((marker) => marker.setMap(null));
+                        climatMarkers.forEach((marker) => marker.setMap(null));
+                        heatMarkers.forEach((marker) => marker.setMap(null));
+                        smartMarkers.forEach((marker) => marker.setMap(null));
+                        coolMarkers.forEach((marker) => marker.setMap(null));
+                        coldMarkers.forEach((marker) => marker.setMap(null));
+                        }
+
+                        // 특정 마커 배열을 지도에 표시하는 함수
+                        function showMarkers(markers) {
+                            console.log('showMarkers called with:', markers);
+                            if (markers && markers.length > 0) {
+                                markers.forEach(marker => {
+                                console.log('Setting marker to map:', marker);
+                                marker.setMap(map);
+                                });
+                            } else {
+                                console.log('showMarkers: No markers to show or empty array');
+                            }
+                        }
+
+                        // 이용자 위치 표시
+                        if (navigator.geolocation) {
+                            // GeoLocation을 이용해서 접속 위치를 얻어옵니다
+                            navigator.geolocation.getCurrentPosition(function(position) {
+                                var lat = position.coords.latitude; // 위도
+                                var lon = position.coords.longitude; // 경도
+
+                                var locPosition = new kakao.maps.LatLng(lat, lon); // 마커가 표시될 위치를 geolocation으로 얻어온 좌표로 생성합니다
+                                var message = '<div style="padding:5px;">현위치</div>'; // 인포윈도우에 표시될 내용입니다
+
+                                // 이용자 위치 마커 생성 및 표시 (zIndex 높게 설정)
+                                var userMarker = new kakao.maps.Marker({
+                                    position: locPosition,
+                                    zIndex: 10 // 다른 마커(기본 zIndex 0)보다 높게 설정
+                                });
+                                userMarker.setMap(map);
+
+                                // 이용자 위치 인포윈도우 생성 및 표시 (zIndex 더 높게 설정)
+                                var infowindow = new kakao.maps.InfoWindow({
+                                    position: locPosition,
+                                    content: message,
+                                    zIndex: 11 // 마커보다 더 높게 설정하여 확실히 앞에 보이도록 함
+                                });
+                                infowindow.open(map, userMarker);
+
+                            }, function(error) { // 오류 발생 시 기본 위치에 표시
+                                var locPosition = new kakao.maps.LatLng(37.566826, 126.9786567); // 기본 위치 (서울)
+                                var message = 'geolocation을 사용할 수 없어요..';
+
+                                var userMarker = new kakao.maps.Marker({
+                                    position: locPosition,
+                                    zIndex: 10
+                                });
+                                userMarker.setMap(map);
+
+                                var infowindow = new kakao.maps.InfoWindow({
+                                    position: locPosition,
+                                    content: message,
+                                    zIndex: 11
+                                });
+                                infowindow.open(map, userMarker);
+                            });
+                        } else { // HTML5의 GeoLocation을 사용할 수 없을때 마커 표시 위치와 인포윈도우 내용을 설정합니다
+                            var locPosition = new kakao.maps.LatLng(37.566826, 126.9786567); // 기본 위치 (서울)
+                            var message = 'geolocation을 사용할 수 없어요..';
+
+                            var userMarker = new kakao.maps.Marker({
+                                position: locPosition,
+                                zIndex: 10
+                            });
+                            userMarker.setMap(map);
+
+                            var infowindow = new kakao.maps.InfoWindow({
+                                position: locPosition,
+                                content: message,
+                                zIndex: 11
+                            });
+                            infowindow.open(map, userMarker);
+                        }
+
+                        // 지도에 마커와 인포윈도우를 표시하는 함수입니다
+                        function displayMarker(locPosition, message) {
+
+                        // 마커를 생성합니다
+                        var marker = new kakao.maps.Marker({
+                            map: map,
+                            position: locPosition
+                        });
+
+                        var iwContent = message, // 인포윈도우에 표시할 내용
+                            iwRemoveable = true;
+
+                        // 인포윈도우를 생성합니다
+                        var infowindow = new kakao.maps.InfoWindow({
+                            content: iwContent,
+                            removable: iwRemoveable
+                        });
+
+                        // 인포윈도우를 마커위에 표시합니다
+                        infowindow.open(map, marker);
+
+                        // 지도 중심좌표를 접속위치로 변경합니다
+                        map.setCenter(locPosition);
+                        }
+                        //검색 주소 표시 코드
+                        var geocoder = new kakao.maps.services.Geocoder();
+                        let currentMarker = null; 
+                        const searchInput = document.getElementById('searchInput'); // HTML에 추가한 input ID
+                        const searchButton = document.getElementById('btnNavbarSearch'); // 검색 버튼 ID
+                        searchButton.addEventListener('click', function() {
+                            performSearch();
+                        });
+
+                        // input 필드에서 Enter 키를 눌렀을 때도 검색을 수행하도록 이벤트 리스너를 추가합니다.
+                        searchInput.addEventListener('keypress', function(event) {
+                            // Enter 키 코드(13) 또는 'Enter' 키 이름을 확인합니다.
+                            if (event.key === 'Enter') {
+                                event.preventDefault();
+                                performSearch();
+                            }
+                        });
+
+                        // 4. 주소 검색 및 결과 처리를 담당하는 함수를 정의합니다.
+                        function performSearch() {
+                            const address = searchInput.value; // input 필드의 현재 값을 가져옵니다.
+
+                            // 입력 값이 비어있는지 확인
+                            if (!address) {
+                                alert('주소를 입력해주세요!');
+                                return; // 함수 실행 중단
+                            }
+
+                            // Kakao Maps Geocoder를 사용하여 주소로 좌표를 검색합니다.
+                            geocoder.addressSearch(address, function(result, status) {
+                                // 정상적으로 검색이 완료됐으면
+                                if (status === kakao.maps.services.Status.OK) {
+
+                                    var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+                                    // (기존 마커가 있다면 제거하는 로직을 추가
+                                    if (currentMarker) {
+                                        currentMarker.setMap(null);
+                                    }
+
+                                    // 결과값으로 받은 위치를 마커로 표시합니다.
+                                    var marker = new kakao.maps.Marker({
+                                        map: map, // 전역 변수 'map' 사용
+                                        position: coords
+                                    });
+                                    currentMarker = marker; // 마커 객체 저장
+
+                                    // 인포윈도우로 장소에 대한 설명을 표시합니다.
+                                    var infowindow = new kakao.maps.InfoWindow({
+                                        content: '<div style="width:150px;text-align:center;padding:6px 0;">검색한 위치</div>'
+                                    });
+                                    infowindow.open(map, marker);
+
+                                    // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다.
+                                    map.setCenter(coords);
+
+                                } else {
+                                    // 주소 검색 실패 시 처리
+                                    alert('주소 검색에 실패했습니다. 다시 확인해주세요: ' + status);
+                                    // 실패 시 기존 마커나 인포윈도우를 제거하려면 위의 주석 처리된 코드를 활용하세요.
+                                }
+                            });
+                        }
+                    </script>
+                </main>
+                <footer class="py-4 bg-light mt-auto">
+                    <div class="container-fluid px-4">
+                        <div class="d-flex align-items-center justify-content-between small">
+                            <div class="text-muted">Copyright &copy; Your Website 2023</div>
+                            <div>
+                                <a href="#">Privacy Policy</a>
+                                &middot;
+                                <a href="#">Terms &amp; Conditions</a>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <script src="js/scripts.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+        <script src="assets/demo/chart-area-demo.js"></script>
+        <script src="assets/demo/chart-bar-demo.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+        <script src="js/datatables-simple-demo.js"></script>
+    </body>
+</html>
