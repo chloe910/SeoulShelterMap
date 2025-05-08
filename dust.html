@@ -163,13 +163,13 @@
                             }
                             //인포인도우에 표시할 링크 생성
                             let menuUrl = '';
-                            switch (data['쉼터 종류']) {
-                                case '그늘막': menuUrl = '/shadetables.html?search=' + encodeURIComponent(data['쉼터명']);break;
-                                case '기후동행쉼터': menuUrl = '/climattables.html?search=' + encodeURIComponent(data['쉼터명']);break;
-                                case '무더위쉼터': menuUrl = '/heattables.html?search=' + encodeURIComponent(data['쉼터명']);break;
-                                case '스마트쉼터': menuUrl = '/smarttables.html?search=' + encodeURIComponent(data['쉼터명']);break;
-                                case '쿨하다 캠페인': menuUrl = '/cooltables.html?search=' + encodeURIComponent(data['쉼터명']);break;
-                                case '한파쉼터터': menuUrl = '/coldtables.html?search=' + encodeURIComponent(data['쉼터명']);break;
+                            switch (data.category) {
+                                case '그늘막': menuUrl = 'https://chloe910.github.io/SeoulShelterMap/shadetables.html';break;
+                                case '기후동행쉼터': menuUrl = 'https://chloe910.github.io/SeoulShelterMap/climattables.html';break;
+                                case '무더위쉼터': menuUrl = 'https://chloe910.github.io/SeoulShelterMap/heattables.html';break;
+                                case '스마트쉼터': menuUrl = 'https://chloe910.github.io/SeoulShelterMap/smarttables.html';break;
+                                case '쿨하다 캠페인': menuUrl = 'https://chloe910.github.io/SeoulShelterMap/cooltables.html';break;
+                                case '한파쉼터': menuUrl = 'https://chloe910.github.io/SeoulShelterMap/coldtables.html';break;
                             }
 
                             // 인포윈도우에 표시할 내용 생성
